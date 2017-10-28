@@ -5,27 +5,29 @@ import {
 } from '../api/api'
 
 export default {
-  FETCH_LIST_DATA: ({ commit, dispatch, state, getters }, { type }) => {
-    commit('SET_ACTIVE_TYPE', { type })
+  fetchListData: ({ commit, dispatch, state, getters }, { type }) => {
+    commit('setActiveType', { type })
     return fetchIdsByType(type)
-      .then(ids => commit('SET_LIST', { type, ids }))
-      .then(() => dispatch('FETCH_ITEMS', {
+      .then(ids => commit('setList', { type, ids }))
+      .then(() => dispatch('fetchItems', {
         ids: getters.activeIds
       }))
   },
 
-  FETCH_ITEMS: ({ commit, state }, { ids }) => {
-    const fileredIds = ids.filter(id => !state.items[id])
-    if (fileredIds.length) {
-      return fetchItems(fileredIds).then(items => commit('SET_ITEMS', { items }))
+  fetchItems: ({ commit, state }, { ids }) => {
+    const filteredIds = ids.filter(id => !state.items[id])
+    if (filteredIds.length) {
+      return fetchItems(filteredIds).then(items => {
+        commit('setItems', { items })
+      })
     } else {
       return Promise.resolve()
     }
   },
 
-  FETCH_USER: ({ commit, state }, { id }) => {
+  fetchUser: ({ commit, state }, { id }) => {
     return state.users[id]
       ? Promise.resolve(state.users[id])
-      : fetchUser(id).then(user => commit('SET_USER', { id, user }))
+      : fetchUser(id).then(user => commit('setUser', { id, user }))
   }
 }

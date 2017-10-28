@@ -1,17 +1,9 @@
-export function fetchIdsByType () {
-  return Promise.resolve()
-}
+export const fetchIdsByType = jest.fn(() => Promise.resolve())
 
-export function fetchItem () {
-  return Promise.resolve({})
-}
+export const fetchItem = jest.fn(() => Promise.resolve())
 
-export function fetchItems () {
-  return Promise.resolve([{}, {}, {}])
-}
+export const fetchItems = jest.fn(() => Promise.resolve())
 
-export function fetchUser () {
-  return Promise.resolve()
-}
+export const fetchUser = jest.fn(() => Promise.resolve())
 
-export function watchList () {}
+export const watchList = jest.fn(() => Promise.resolve())

@@ -1,29 +1,45 @@
 jest.mock('../../api/api.js')
 jest.useRealTimers()
 
-import { mount } from 'vue-test-utils'
+import { mount, createLocalVue } from 'vue-test-utils'
+import Vuex from 'vuex'
 import ItemList from '../ItemList.vue'
 import Item from '../../components/Item.vue'
-import { fetchItems } from '../../api/api'
 
 describe('ItemList.vue', () => {
-  let items
+  const localVue = createLocalVue()
+  localVue.use(Vuex)
+  let actions
+  let getters
+  let store
+
   beforeEach(() => {
-    return fetchItems().then((returnedItems) => {
-      items = returnedItems
+    actions = {
+      fetchListData: jest.fn(() => Promise.resolve())
+    }
+    getters = {
+      activeItems: jest.fn()
+    }
+    store = new Vuex.Store({
+      state: {},
+      getters,
+      actions
     })
   })
 
-  test('renders an Item for each item returned by fetchItems', (done) => {
+  test('renders an Item for each item in activeItems getter', (done) => {
     const $bar = {
       start: () => {},
       finish: () => {}
     }
-    const wrapper = mount(ItemList, {intercept: {$bar}})
+    const items = [{}, {}, {}]
+    getters.activeItems.mockImplementation(() => items)
+
+    const wrapper = mount(ItemList, {mocks: {$bar}, localVue, store})
     setTimeout(() => {
-      expect(wrapper.findAll(Item).length).toEqual(items.length)
+      expect(wrapper.findAll(Item).length).toBe(items.length)
       done()
-    }, 0)
+    })
   })
 
   test('passes an item object to each Item component', () => {
@@ -31,7 +47,7 @@ describe('ItemList.vue', () => {
       start: () => {},
       finish: () => {}
     }
-    const wrapper = mount(ItemList, {intercept: {$bar}})
+    const wrapper = mount(ItemList, {mocks: {$bar}, localVue, store})
     const Items = wrapper.findAll(Item)
     Items.wrappers.forEach((wrapper, i) => {
       expect(wrapper.vm.item).toBe(window.items[i])
@@ -43,7 +59,7 @@ describe('ItemList.vue', () => {
       start: jest.fn(),
       finish: () => {}
     }
-    mount(ItemList, {intercept: {$bar}})
+    mount(ItemList, {mocks: {$bar}, localVue, store})
     expect($bar.start).toHaveBeenCalled()
   })
 
@@ -52,10 +68,10 @@ describe('ItemList.vue', () => {
       start: () => {},
       finish: jest.fn()
     }
-    mount(ItemList, {intercept: {$bar}})
+    mount(ItemList, {mocks: {$bar}, localVue, store})
     setTimeout(() => {
       expect($bar.finish).toHaveBeenCalled()
       done()
-    }, 0)
+    })
   })
 })

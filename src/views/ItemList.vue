@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import {mapActions} from 'vuex'
 import Item from '../components/Item.vue'
 
 export default {
@@ -28,9 +29,10 @@ export default {
   },
 
   methods: {
+    ...mapActions(['fetchListData']),
     loadItems () {
       this.$bar.start()
-      this.$store.dispatch('FETCH_LIST_DATA', {
+      this.fetchListData({
         type: 'top'
       }).then(() => {
         this.displayedItems = this.$store.getters.activeItems

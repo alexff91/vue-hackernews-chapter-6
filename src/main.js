@@ -1,7 +1,12 @@
 import Vue from 'vue'
+import Vuex from 'vuex'
 import App from './App'
 import ProgressBar from './components/ProgressBar'
-import store from './store/store'
+import storeConfig from './store/store-config'
+
+Vue.use(Vuex)
+
+const store = new Vuex.Store(storeConfig)
 
 Vue.config.productionTip = false
 
