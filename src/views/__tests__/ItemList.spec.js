@@ -3,6 +3,7 @@ jest.useRealTimers()
 
 import { mount, createLocalVue } from 'vue-test-utils'
 import Vuex from 'vuex'
+import flushPromises from 'flush-promises'
 import ItemList from '../ItemList.vue'
 import Item from '../../components/Item.vue'
 
@@ -27,7 +28,7 @@ describe('ItemList.vue', () => {
     })
   })
 
-  test('renders an Item for each item in activeItems getter', (done) => {
+  test('renders an Item for each item in activeItems getter', async () => {
     const $bar = {
       start: () => {},
       finish: () => {}
@@ -36,10 +37,8 @@ describe('ItemList.vue', () => {
     getters.activeItems.mockImplementation(() => items)
 
     const wrapper = mount(ItemList, {mocks: {$bar}, localVue, store})
-    setTimeout(() => {
-      expect(wrapper.findAll(Item).length).toBe(items.length)
-      done()
-    })
+    await flushPromises()
+    expect(wrapper.findAll(Item).length).toBe(items.length)
   })
 
   test('passes an item object to each Item component', () => {
@@ -63,15 +62,13 @@ describe('ItemList.vue', () => {
     expect($bar.start).toHaveBeenCalled()
   })
 
-  test('calls $bar finish when load succesful', (done) => {
+  test('calls $bar finish when load succesful', async () => {
     const $bar = {
       start: () => {},
       finish: jest.fn()
     }
     mount(ItemList, {mocks: {$bar}, localVue, store})
-    setTimeout(() => {
-      expect($bar.finish).toHaveBeenCalled()
-      done()
-    })
+    await flushPromises()
+    expect($bar.finish).toHaveBeenCalled()
   })
 })

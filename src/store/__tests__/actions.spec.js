@@ -1,6 +1,7 @@
-import actions from '../actions'
 jest.mock('../../api/api')
+import actions from '../actions'
 import { fetchIdsByType, fetchItems, fetchUser } from '../../api/api'
+import flushPromises from 'flush-promises'
 
 describe('actions', () => {
   test('fetchListData calls commit with setActiveType and the type', () => {
@@ -10,7 +11,7 @@ describe('actions', () => {
     expect(commit).toHaveBeenCalledWith('setActiveType', { type })
   })
 
-  test('fetchListData calls commit with setList and the result of fetchIdsByType', (done) => {
+  test('fetchListData calls commit with setList and the result of fetchIdsByType', async () => {
     const ids = [{}, {}, {}]
     const getters = {
       activeIds: ''
@@ -21,13 +22,11 @@ describe('actions', () => {
     actions.fetchListData({
       commit, getters, dispatch: jest.fn()
     }, { type, ids })
-    setTimeout(() => {
-      expect(commit).toHaveBeenCalledWith('setList', { type, ids })
-      done()
-    })
+    await flushPromises()
+    expect(commit).toHaveBeenCalledWith('setList', { type, ids })
   })
 
-  test('fetchListData calls dispatch with setList and the result of fetchIdsByType', (done) => {
+  test('fetchListData calls dispatch with setList and the result of fetchIdsByType', async () => {
     const ids = [{}, {}, {}]
     const getters = {activeIds: ['sad', 'asd']}
     const dispatch = jest.fn()
@@ -36,17 +35,15 @@ describe('actions', () => {
     actions.fetchListData({
       commit: jest.fn(), getters, dispatch
     }, { type, ids })
-    setTimeout(() => {
-      expect(dispatch).toHaveBeenCalledWith('fetchItems', { ids: getters.activeIds })
-      done()
-    })
+    await flushPromises()
+    expect(dispatch).toHaveBeenCalledWith('fetchItems', { ids: getters.activeIds })
   })
 
   test('fetchItems returns a Promise resolve if ids is an empty array', () => {
     return expect(actions.fetchItems({}, {ids: []})).resolves.toBe()
   })
 
-  test('fetchItems calls commit with ids returned by fetchItems if they do not exist in state', (done) => {
+  test('fetchItems calls commit with ids returned by fetchItems if they do not exist in state', async () => {
     const ids = ['a1', 'a2']
     const state = {
       items: {}
@@ -55,13 +52,11 @@ describe('actions', () => {
     fetchItems.mockImplementation(() => Promise.resolve(items))
     const commit = jest.fn()
     actions.fetchItems({ commit, state }, { ids })
-    setTimeout(() => {
-      expect(commit).toHaveBeenCalledWith('setItems', { items })
-      done()
-    })
+    await flushPromises()
+    expect(commit).toHaveBeenCalledWith('setItems', { items })
   })
 
-  test('fetchItems does not call commit if ids exist in state', (done) => {
+  test('fetchItems does not call commit if ids exist in state', async () => {
     const ids = ['a1', 'a2']
     const state = {
       items: {
@@ -71,10 +66,8 @@ describe('actions', () => {
     }
     const commit = jest.fn()
     actions.fetchItems({ commit, state }, { ids })
-    setTimeout(() => {
-      expect(commit).not.toHaveBeenCalled()
-      done()
-    })
+    await flushPromises()
+    expect(commit).not.toHaveBeenCalled()
   })
 
   test('fetchUser resolves with state.user matching id if it exists', () => {
@@ -87,7 +80,7 @@ describe('actions', () => {
     return expect(actions.fetchUser({ state }, { id })).resolves.toBe(state.users.a1)
   })
 
-  test('fetchUser calls commit with the result of fetchUser if it does not exist in state', (done) => {
+  test('fetchUser calls commit with the result of fetchUser if it does not exist in state', async () => {
     const id = 'a1'
     const user = { name: 'Edd' }
     const state = {
@@ -96,9 +89,7 @@ describe('actions', () => {
     const commit = jest.fn()
     fetchUser.mockImplementation(() => Promise.resolve(user))
     actions.fetchUser({ state, commit }, { id })
-    setTimeout(() => {
-      expect(commit).toHaveBeenCalledWith('setUser', { id, user })
-      done()
-    })
+    await flushPromises
+    expect(commit).toHaveBeenCalledWith('setUser', { id, user })
   })
 })

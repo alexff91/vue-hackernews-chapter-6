@@ -6,6 +6,20 @@ import storeConfig from './store/store-config'
 
 Vue.use(Vuex)
 
+Vue.mixin({
+  beforeRouteUpdate (to, from, next) {
+    const { asyncData } = this.$options
+    if (asyncData) {
+      asyncData({
+        store: this.$store,
+        route: to
+      }).then(next).catch(next)
+    } else {
+      next()
+    }
+  }
+})
+
 const store = new Vuex.Store(storeConfig)
 
 Vue.config.productionTip = false
