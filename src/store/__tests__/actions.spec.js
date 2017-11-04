@@ -5,38 +5,42 @@ import flushPromises from 'flush-promises'
 
 describe('actions', () => {
   test('fetchListData calls commit with setActiveType and the type', () => {
-    const commit = jest.fn()
     const type = 'top'
-    actions.fetchListData({commit, getters: {}, dispatch: jest.fn()}, { type })
-    expect(commit).toHaveBeenCalledWith('setActiveType', { type })
+    const context = {
+      commit: jest.fn(),
+      getters: {},
+      dispatch: jest.fn()
+    }
+    actions.fetchListData(context, { type })
+    expect(context.commit).toHaveBeenCalledWith('setActiveType', { type })
   })
 
   test('fetchListData calls commit with setList and the result of fetchIdsByType', async () => {
     const ids = [{}, {}, {}]
-    const getters = {
-      activeIds: ''
-    }
     const type = 'top'
-    fetchIdsByType.mockImplementation(calledWith => calledWith === type ? Promise.resolve(ids) : null)
-    const commit = jest.fn()
-    actions.fetchListData({
-      commit, getters, dispatch: jest.fn()
-    }, { type, ids })
+    fetchIdsByType.mockImplementation(calledWith => calledWith === type ? Promise.resolve(ids) : Promise.resolve()) // #B
+    const context = {
+      commit: jest.fn(),
+      getters: {},
+      dispatch: jest.fn()
+    }
+    actions.fetchListData(context, { type })
     await flushPromises()
-    expect(commit).toHaveBeenCalledWith('setList', { type, ids })
+    expect(context.commit).toHaveBeenCalledWith('setList', { type, ids })
   })
 
-  test('fetchListData calls dispatch with setList and the result of fetchIdsByType', async () => {
+  test('fetchListData calls dispatch with setList and the result of getters.activeIds', async () => {
     const ids = [{}, {}, {}]
-    const getters = {activeIds: ['sad', 'asd']}
-    const dispatch = jest.fn()
     const type = 'top'
-    fetchIdsByType.mockImplementation(calledWith => calledWith === type ? Promise.resolve(ids) : null)
-    actions.fetchListData({
-      commit: jest.fn(), getters, dispatch
-    }, { type, ids })
+    const context = {
+      commit: jest.fn(),
+      getters: {activeIds: ['id1', 'id2']},
+      dispatch: jest.fn()
+    }
+    fetchIdsByType.mockImplementation(calledWith => calledWith === type ? Promise.resolve(ids) : Promise.resolve())
+    actions.fetchListData(context, { type })
     await flushPromises()
-    expect(dispatch).toHaveBeenCalledWith('fetchItems', { ids: getters.activeIds })
+    expect(context.dispatch).toHaveBeenCalledWith('fetchItems', { ids: context.getters.activeIds })
   })
 
   test('fetchItems returns a Promise resolve if ids is an empty array', () => {
@@ -50,7 +54,6 @@ describe('actions', () => {
     }
     const items = ['asd', 'asd']
     function calledWithIds (filteredIds) {
-      console.log(filteredIds.every((id, i) => id === ids[i]))
       return filteredIds.every((id, i) => id === ids[i])
     }
     fetchItems.mockImplementation(calledWith => calledWithIds(calledWith) ? Promise.resolve(items) : null)
