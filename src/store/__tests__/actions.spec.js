@@ -53,14 +53,17 @@ describe('actions', () => {
       items: {}
     }
     const items = ['asd', 'asd']
+    const context = {
+      commit: jest.fn(),
+      state
+    }
     function calledWithIds (filteredIds) {
       return filteredIds.every((id, i) => id === ids[i])
     }
     fetchItems.mockImplementation(calledWith => calledWithIds(calledWith) ? Promise.resolve(items) : null)
-    const commit = jest.fn()
-    actions.fetchItems({ commit, state }, { ids })
+    actions.fetchItems(context, { ids })
     await flushPromises()
-    expect(commit).toHaveBeenCalledWith('setItems', { items })
+    expect(context.commit).toHaveBeenCalledWith('setItems', { items })
   })
 
   test('fetchItems does not call commit if ids exist in state', async () => {
@@ -71,10 +74,13 @@ describe('actions', () => {
         a2: {}
       }
     }
-    const commit = jest.fn()
-    actions.fetchItems({ commit, state }, { ids })
+    const context = {
+      commit: jest.fn(),
+      state
+    }
+    actions.fetchItems(context, { ids })
     await flushPromises()
-    expect(commit).not.toHaveBeenCalled()
+    expect(context.commit).not.toHaveBeenCalled()
   })
 
   test('fetchUser resolves with state.user matching id if it exists', () => {
@@ -93,10 +99,13 @@ describe('actions', () => {
     const state = {
       users: {}
     }
-    const commit = jest.fn()
+    const context = {
+      commit: jest.fn(),
+      state
+    }
     fetchUser.mockImplementation(calledWith => calledWith === id ? Promise.resolve(user) : null)
-    actions.fetchUser({ state, commit }, { id })
+    actions.fetchUser(context, { id })
     await flushPromises
-    expect(commit).toHaveBeenCalledWith('setUser', { id, user })
+    expect(context.commit).toHaveBeenCalledWith('setUser', { id, user })
   })
 })
