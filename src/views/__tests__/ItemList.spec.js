@@ -34,7 +34,7 @@ describe('ItemList.vue', () => {
       finish: () => {}
     }
     const items = [{}, {}, {}]
-    getters.activeItems.mockImplementation(() => items)
+    getters.activeItems.mockReturnValue(items)
 
     const wrapper = mount(ItemList, {mocks: {$bar}, localVue, store})
     await flushPromises()

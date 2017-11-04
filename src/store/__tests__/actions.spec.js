@@ -16,7 +16,7 @@ describe('actions', () => {
     const getters = {
       activeIds: ''
     }
-    fetchIdsByType.mockImplementation(() => Promise.resolve(ids))
+    fetchIdsByType.mockReturnValue(Promise.resolve(ids))
     const commit = jest.fn()
     const type = 'top'
     actions.fetchListData({
@@ -30,7 +30,7 @@ describe('actions', () => {
     const ids = [{}, {}, {}]
     const getters = {activeIds: ['sad', 'asd']}
     const dispatch = jest.fn()
-    fetchIdsByType.mockImplementation(() => Promise.resolve(ids))
+    fetchIdsByType.mockReturnValue(Promise.resolve(ids))
     const type = 'top'
     actions.fetchListData({
       commit: jest.fn(), getters, dispatch
@@ -49,7 +49,7 @@ describe('actions', () => {
       items: {}
     }
     const items = ['asd', 'asd']
-    fetchItems.mockImplementation(() => Promise.resolve(items))
+    fetchItems.mockReturnValue(Promise.resolve(items))
     const commit = jest.fn()
     actions.fetchItems({ commit, state }, { ids })
     await flushPromises()
@@ -87,7 +87,7 @@ describe('actions', () => {
       users: {}
     }
     const commit = jest.fn()
-    fetchUser.mockImplementation(() => Promise.resolve(user))
+    fetchUser.mockReturnValue(Promise.resolve(user))
     actions.fetchUser({ state, commit }, { id })
     await flushPromises
     expect(commit).toHaveBeenCalledWith('setUser', { id, user })

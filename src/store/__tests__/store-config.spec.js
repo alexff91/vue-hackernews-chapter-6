@@ -27,8 +27,8 @@ describe('store-config', () => {
     localVue.use(Vuex)
     const store = new Vuex.Store(storeConfig)
     const type = 'top'
-    fetchIdsByType.mockImplementation(() => Promise.resolve(ids))
-    fetchItems.mockImplementation(() => Promise.resolve(items))
+    fetchIdsByType.mockReturnValue(Promise.resolve(ids))
+    fetchItems.mockReturnValue(Promise.resolve(items))
     store.dispatch('fetchListData', { type })
 
     await flushPromises()
