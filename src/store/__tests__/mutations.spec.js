@@ -1,4 +1,3 @@
-jest.mock('../../api/api')
 jest.mock('vue', () => ({set: jest.fn()}))
 
 import Vue from 'vue'
