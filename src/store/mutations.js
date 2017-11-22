@@ -5,7 +5,7 @@ export default {
     state.activeType = type
   },
 
-  setList (state, { type, ids })  {
+  setList (state, { type, ids }) {
     state.lists[type] = ids
   },
 
